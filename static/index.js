@@ -1,25 +1,75 @@
 'use strict';
 
 require('angular');
-const firebase = require('firebase');
+require('angular-ui-router');
+require('lodash');
+require('restangular');
 
-// Initialize Firebase
-var config = {
-    apiKey: "AIzaSyDv7owf1d-1CDwJjWsKAKwMhBfR2tWGPfo",
-    authDomain: "file-share-b51fd.firebaseapp.com",
-    databaseURL: "https://file-share-b51fd.firebaseio.com",
-    storageBucket: "file-share-b51fd.appspot.com",
-  };
-  firebase.initializeApp(config);
 
-const postKey = firebase.database().ref().child('posts').push().key;
-firebase.database().ref().update({
-  [`/posts/${postKey}`]: {
-    body: 'hello world'
-  }
-}).then(res => console.log('post created', res), err => console.error('could not create post', err));
+var app = angular.module('file-share', ['ui.router', 'restangular']);
 
-const restangular = require('restangular');
-const nguiRoute = require('angular-ui-router');
-console.log('Hello world');
+app.config(function($stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise('/accueil');
+    $stateProvider
+      .state('accueil', {
+        url: '/accueil',
+        template: '<div>{{restMessage}}<br>{{restSubtitle}}'+
+                    '<button ui-sref=\'accueil.off\'>Fuck off</button>'+
+                    '<button ui-sref=\'accueil.this\'>Fuck this</button>'+
+                    '<button ui-sref=\'accueil.bye\'>Bye</button>'+
+                    '<div ui-view></div>'+
+                  '</div>',
+      }).state('accueil.off', {
+        url: '/off',
+        template: '<div>{{restMessage}}<br>{{restSubtitle}}<div ui-view></div></div>',
+        resolve: {
+           rest : function(Restangular){
+             Restangular.setBaseUrl('http://foaas.com/');
+             return Restangular.one('off', 'Darth Vader').get();
+           }
+        },
+        controller: function($scope, rest){
+          $scope.restMessage = rest.message;
+          $scope.restSubtitle = rest.subtitle;
+          console.log(rest.message);
+          console.log(rest.subtitle);
+        }
+      });
+      
+      $stateProvider.state('accueil.this', {
+        url: '/this',
+        template: '<div>{{restMessage}}<br>{{restSubtitle}}<div ui-view></div></div>',
+        resolve: {
+           rest : function(Restangular){
+             Restangular.setBaseUrl('http://foaas.com/');
+             return Restangular.one('this', 'Darth Vader').get();
+           }
+        },
+        controller: function($scope, rest){
+          $scope.restMessage = rest.message;
+          $scope.restSubtitle = rest.subtitle;
+          console.log(rest.message);
+          console.log(rest.subtitle);
+        }
+      });
+      
+      $stateProvider.state('accueil.bye', {
+        url: '/bye',
+        template: '<div>{{restMessage}}<br>{{restSubtitle}}<div ui-view></div></div>',
+        resolve: {
+           rest : function(Restangular){
+             Restangular.setBaseUrl('http://foaas.com/');
+             return Restangular.one('bye', 'Obi-Wan').get();
+           }
+        },
+        controller: function($scope, rest){
+          $scope.restMessage = rest.message;
+          $scope.restSubtitle = rest.subtitle;
+          console.log(rest.message);
+          console.log(rest.subtitle);
+        }
+      });
+});
+
+
 
